@@ -11,9 +11,11 @@ const moveSpeed = 100;
 const jumpForce = 360;
 const bigJumpForce = 550
 let currentJumpForce = jumpForce 
+let canBreak = false
 let isJumping = true;
-let isBig=true;
-let enemyMoveSpeed = -20;
+let isBig=false;
+let enemyXSpeed = -20;
+let enemyYSpeed = -20;
 const fallDeath = 400;
 
 loadRoot('./images/')
@@ -26,46 +28,68 @@ loadSprite('prize', 'prizeBlock.png')
 loadSprite('mario', 'mario.png')
 loadSprite('blocked', 'prizedBlocked.png')
 loadSprite('mushroom', 'mushroom.png')
+loadSprite('bug', 'bug.png')
+
 
 scene('game', ({level, score}) => {
     layers(['bg', 'obj', 'ui'], 'obj' )
 
-    const map =[
-       
-        '                                                  ',
-        '                                             n    ',
-        '                                                  ',
-        '                                          xxxxx   ',
-        '                                 xxxxxx           ',
-        '                                                  ',
-        '                      %%                          ',
-        '                xxx                       xxx     ',
-        '                                                  ',
-        '          *%          xxxx       xxxxxx           ',
-        '                                                  ',
-        '                                         xxxxx    ',
-        '     %  =====                        xxxxxxxx     ',
-        '                  o                 xxxxxxxxxx    ',
-        'xxx             ^            x   ^xxxxxxxxxxxxxxxx',
-        'xxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxx '
+    const maps =[
+        [
+            '                                                  ',
+            '                                             n    ',
+            '                                                  ',
+            '                                          xxxxx   ',
+            '                                 xxxxxx           ',
+            '                                                  ',
+            '                      %%                          ',
+            '                xxx                       xxx     ',
+            '                                                  ',
+            '          *%          xxxx       xxxxxx           ',
+            '                                                  ',
+            '                                         xxxxx    ',
+            '     %  =====                        xxxxxxxx     ',
+            '                  o                 xxxxxxxxxx    ',
+            'xxx             ^            x   ^xxxxxxxxxxxxxxxx',
+            'xxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxx '
+        ],
+        [
+            '          % = %                                   ',
+            '                         v       %=%              ',
+            '                                                  ',
+            '          xxxxx                                   ',
+            '                               xxxxxxx            ',
+            'xxxxx             xxxxx                           ',
+            '                          xxxx                 v  ',
+            '          xxxxxx                    n             ',
+            '*                                                 ',
+            '      xxx       xxxxxxxx         xxxxxx           ',
+            '                                                  ',
+            'xxxx                                              ',
+            '                           v          xxxx       ',
+            '                                                  ',
+           
+        ]
     ]
 
     const levelConfig = {
         width: 20,
         height: 20,
-        '=' : [sprite( 'block'), solid(), 'nonMovable'],
+        '=' : [sprite( 'block'), solid(), 'nonMovable', 'breakable'],
         'x' : [sprite( 'brick') , solid(), 'nonMovable'],
         '^' : [sprite( 'shroom1'), solid(), body(), 'dangerous'],
+        'v' : [sprite('bug'), solid(), scale(0.10), 'dangerous', 'flyable'],
         'o' : [sprite( 'pipe'), solid(),scale(1.5)],
         '$' : [sprite( 'coin'), 'coin'],
         '%' : [sprite( 'prize'), solid(),'coin-prize'],
         '*' : [sprite( 'prize'), solid(),'mushroom-prize'],
         '~' : [sprite( 'mushroom'), body(), 'mushroom'],
         '!' : [sprite('blocked'), solid()], 
-        'n' : [sprite('pipe'), solid(), color(20, 20, 100),'nextLevel']   
+        'n' : [sprite('pipe'), solid(), color(20, 20, 100),'nextLevel'] 
+
     }
 
-    const gameLevel = addLevel(map, levelConfig)
+    const gameLevel = addLevel(maps[1], levelConfig)
 
     const scoreLabel = add([
         text(score, 10),
@@ -81,30 +105,18 @@ scene('game', ({level, score}) => {
     ])
 
     const big = ()=>{
-        let timer = 0;
         return{
-            update(){
-                if(isBig){
-                    currentJumpForce = bigJumpForce
-                    timer-=dt();
-                    if(timer <= 0){
-                        this.smallify()
-                    }
-                }
-            },
-            isBig(){
-                return isBig
-            },
             smallify(){
                 this.scale = vec2(1)
                 currentJumpForce = jumpForce
-                timer = 0
                 isBig = false
+                canBreak = false
             },
-            biggify(time){
+            biggify(){
                 this.scale = vec2(1.5)
-                timer = time
+                currentJumpForce = bigJumpForce
                 isBig = true
+                canBreak= true
             }
         }
     }
@@ -123,16 +135,20 @@ scene('game', ({level, score}) => {
     })
     action('dangerous', (d) => {
         if(d.pos.x > player.pos.x){
-            d.move(enemyMoveSpeed, 0)
+            d.move(enemyXSpeed, 0)
         } else if(d.pos.x < player.pos.x){
-            d.move(-enemyMoveSpeed, 0)
+            d.move(-enemyXSpeed, 0)
         }
         
     })
-
-    
-    
-    
+    action('flyable', (f) => {
+        if(f.pos.y > player.pos.y){
+            f.move(0, enemyYSpeed)
+        } else if(f.pos.y < player.pos.y){
+            f.move(0, -enemyYSpeed)
+        }
+        
+    })
     player.action(()=>{
         camPos(player.pos)
         if(player.pos.y >= fallDeath){
@@ -152,11 +168,17 @@ scene('game', ({level, score}) => {
             gameLevel.spawn('!', obj.gridPos.sub(0,0))
 
         }
+        if(obj.is('breakable')){
+            if(canBreak){
+                destroy(obj)
+            }
+        }
     })
 
     player.collides('mushroom', (m)=>{
+        player.biggify()
         destroy(m)
-        player.biggify(10)
+        
     })
     player.collides('coin', (c)=>{
         destroy(c)
@@ -181,7 +203,8 @@ scene('game', ({level, score}) => {
         keyDown('down', ()=>{
             go('game', {
                 level: (level + 1),
-                score: scoreLabel.value
+                score: scoreLabel.value,
+                isBig: isBig
             })
         })
     })
