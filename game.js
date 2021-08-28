@@ -13,6 +13,7 @@ const bigJumpForce = 550
 let currentJumpForce = jumpForce 
 let isJumping = true;
 let isBig=true;
+let enemyMoveSpeed = -20;
 const fallDeath = 400;
 
 loadRoot('./images/')
@@ -26,34 +27,34 @@ loadSprite('mario', 'mario.png')
 loadSprite('blocked', 'prizedBlocked.png')
 loadSprite('mushroom', 'mushroom.png')
 
-scene("game", ({score}) => {
+scene('game', ({level, score}) => {
     layers(['bg', 'obj', 'ui'], 'obj' )
 
     const map =[
        
-        '                                                ',
-        '                                             n  ',
-        '                                                ',
-        '                                          xxxxx ',
-        '                                  xxxxxx        ',
-        '                                                ',
-        '                      %%                        ',
-        '                xxx                       xxx   ',
-        '                                                ',
-        '          *%          xxxx       xxxxxx         ',
-        '                                                ',
-        '                                         xxxxxxx',
-        '     %  =====                        xxxxxxxxxxx',
-        '                  o                 xxxxxxxxxxxx',
-        '                ^            x   ^xxxxxxxxxxxxxx',
-        'xxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxx'
+        '                                                  ',
+        '                                             n    ',
+        '                                                  ',
+        '                                          xxxxx   ',
+        '                                 xxxxxx           ',
+        '                                                  ',
+        '                      %%                          ',
+        '                xxx                       xxx     ',
+        '                                                  ',
+        '          *%          xxxx       xxxxxx           ',
+        '                                                  ',
+        '                                         xxxxx    ',
+        '     %  =====                        xxxxxxxx     ',
+        '                  o                 xxxxxxxxxx    ',
+        'xxx             ^            x   ^xxxxxxxxxxxxxxxx',
+        'xxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxx '
     ]
 
     const levelConfig = {
         width: 20,
         height: 20,
-        '=' : [sprite( 'block'), solid()],
-        'x' : [sprite( 'brick') , solid()],
+        '=' : [sprite( 'block'), solid(), 'nonMovable'],
+        'x' : [sprite( 'brick') , solid(), 'nonMovable'],
         '^' : [sprite( 'shroom1'), solid(), body(), 'dangerous'],
         'o' : [sprite( 'pipe'), solid(),scale(1.5)],
         '$' : [sprite( 'coin'), 'coin'],
@@ -61,18 +62,22 @@ scene("game", ({score}) => {
         '*' : [sprite( 'prize'), solid(),'mushroom-prize'],
         '~' : [sprite( 'mushroom'), body(), 'mushroom'],
         '!' : [sprite('blocked'), solid()], 
-        'n' : [sprite('pipe'), solid(), 'nextLevel']   
+        'n' : [sprite('pipe'), solid(), color(20, 20, 100),'nextLevel']   
     }
 
     const gameLevel = addLevel(map, levelConfig)
 
     const scoreLabel = add([
-        text(score),
-        pos(30, 6),
+        text(score, 10),
+        pos(camPos(30, 6)),
         layer('ui'),
         {
             value: score
         }
+    ])
+
+    add([
+        text('level ' + parseInt(level + 1), 10), pos(50, 6)
     ])
 
     const big = ()=>{
@@ -97,12 +102,13 @@ scene("game", ({score}) => {
                 isBig = false
             },
             biggify(time){
-                this.scale = vec2(2)
+                this.scale = vec2(1.5)
                 timer = time
                 isBig = true
             }
         }
     }
+    const enemy = get('dangerous')
 
     const player = add([
         sprite('mario'), solid(),
@@ -116,8 +122,16 @@ scene("game", ({score}) => {
         m.move(30, 0)
     })
     action('dangerous', (d) => {
-        d.move(-20, 0)
+        if(d.pos.x > player.pos.x){
+            d.move(enemyMoveSpeed, 0)
+        } else if(d.pos.x < player.pos.x){
+            d.move(-enemyMoveSpeed, 0)
+        }
+        
     })
+
+    
+    
     
     player.action(()=>{
         camPos(player.pos)
@@ -126,7 +140,7 @@ scene("game", ({score}) => {
         }
     })
 
-    player.on("headbump", (obj)=>{
+    player.on('headbump', (obj)=>{
         if(obj.is('coin-prize')){
             gameLevel.spawn('$', obj.gridPos.sub(0, 1))
             destroy(obj)
@@ -153,14 +167,25 @@ scene("game", ({score}) => {
     player.collides('dangerous', (d) =>{
         if(isJumping){
             destroy(d)
+            scoreLabel.value++
+            scoreLabel.text = scoreLabel.value
         }else if(isBig){
             player.smallify()
+            destroy(d)
         }else{
             go('lose', {score: scoreLabel.value})
         }
     })
 
-    
+    player.collides('nextLevel', ()=>{
+        keyDown('down', ()=>{
+            go('game', {
+                level: (level + 1),
+                score: scoreLabel.value
+            })
+        })
+    })
+       
     keyDown('left', ()=>{
         player.move(-moveSpeed, 0);
     })
@@ -184,7 +209,8 @@ scene("game", ({score}) => {
 })
 
 scene('lose', ({score})=>{
-    add([text(score, 32), origin('center'), pos(width()/2, height()/2)])
+    add([text("You lose!", 32), origin('left'), pos(width()/4, height()/4)]),
+    add([text("You had a score of " + score, 32), pos(width()/4, height()/4 + 100)])
 })
 
-start('game', {score:0})
+start('game', {level: 0, score:0})
