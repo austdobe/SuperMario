@@ -242,12 +242,12 @@ scene('game', ({level, score}) => {
             pos(0, 0)
         ])
         
-    //     if(level > -1){
-    //        levelSound = play(soundArray[level])
+        if(level > -1){
+           levelSound = play(soundArray[level])
            
-    //     } else{
-    //         levelSound = null
-    //     }
+        } else{
+            levelSound = null
+        }
     }
     const levelConfig = {
         width: 20,
@@ -266,7 +266,7 @@ scene('game', ({level, score}) => {
         'n' : [sprite('pipe'), solid(), color(20, 20, 100),'nextLevel'],
         'u' : [sprite( 'pipe'), solid(),scale(1), rotate(3.15)],
         'c' : [sprite('cloudBlock'), scale(2), solid(), 'nonMovable'],
-        'h' : [sprite( 'castle'), scale(1.5), 'castle'],
+        'h' : [sprite( 'castle'), scale(1.5), 'castle', 'nextLevel'],
         
         //blue objects
         'm' : [sprite('blueMetal'), solid(), scale(0.5), 'nonMovable'],
@@ -283,7 +283,7 @@ scene('game', ({level, score}) => {
 
     }
 
-    const gameLevel = addLevel(maps[3], levelConfig)
+    const gameLevel = addLevel(maps[level], levelConfig)
 
     const scoreLabel = add([
         text(score, 10),
