@@ -168,7 +168,7 @@ scene('game', ({level, score}) => {
             'p  n           pppp             pppp                    ppppp   ppppp   ppppppp   pppppppp              p',
             'p       b      pppp             pppp                                                                    p', 
             'pppppppppppppppppppppppppppppppppppppppppppppppppppppp                                       pppppppppppp', 
-            'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp', 
+            'ptttttttttttttttttttttttttttttttttttttttttttttttttttttwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwtttttttttttp', 
             'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
             'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
             'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
@@ -280,7 +280,7 @@ scene('game', ({level, score}) => {
         'w' : [sprite('water'), scale(1.5), 'water'],
         '+' : [sprite('blueBlock'), solid(), scale(0.5), 'nonMovable', 'superPurse'],
         '8' : [sprite( 'coin'), color(0,0,1), 'purse'],
-
+        't' : [sprite('water'), scale(1.5)],
 
 
     }
