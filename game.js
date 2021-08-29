@@ -233,10 +233,10 @@ scene('game', ({level, score}) => {
     ]
     let levelSound = null;
     const backgroundArray=['levelOneBackground', 'skyImage', 'undergroundBackground','brickBackground'];
-    const soundArray=['main','sky', 'underground']
+    const soundArray=['main','sky', 'underground', 'finalMap.mp3', 'bonusSound.mp3']
     const determineLevelEffects = ()=>{
         add([
-            sprite(backgroundArray[2]),
+            sprite(backgroundArray[level]),
             layer('bg'),
 
             pos(0, 0)
