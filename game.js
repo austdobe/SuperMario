@@ -17,7 +17,7 @@ let isBig=false;
 let enemyXSpeed = -20;
 let enemyYSpeed = -20;
 const fallDeath = 400;
-
+//Sprites
 loadRoot('./images/')
 loadSprite( 'coin' , 'coin.png' )
 loadSprite('shroom1' , 'shroom1.png')
@@ -29,6 +29,21 @@ loadSprite('mario', 'mario.png')
 loadSprite('blocked', 'prizedBlocked.png')
 loadSprite('mushroom', 'mushroom.png')
 loadSprite('bug', 'bug.png')
+//Sounds
+loadRoot('./sounds/')
+loadSound('bigJump', 'bigJump.wav')
+loadSound('smallJump', 'smallJump.wav')
+loadSound('dies', 'marioDies.wav')
+loadSound('coinSound', 'coin.wav')
+loadSound('powerUp', 'powerUp.wav')
+loadSound('downPipe', 'downPipe.wav')
+loadSound('breakBlock', 'breakBlock.wav')
+loadSound('stageClear', 'stageClear.wav')
+loadSound('gameOver', 'gameover.wav')
+loadSound('main', 'mainMario.mp3')
+loadSound('sky', 'theSky.mp3');
+loadSound('underground', 'underGround.mp3')
+loadSound('stomp', 'stomp.wav')
 
 
 scene('game', ({level, score}) => {
@@ -54,6 +69,9 @@ scene('game', ({level, score}) => {
             'xxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxx '
         ],
         [
+            '                                                  ',
+            '                                                  ',
+            '                                                  ',
             '          % = %                                   ',
             '                         v       %=%              ',
             '                                                  ',
@@ -66,15 +84,45 @@ scene('game', ({level, score}) => {
             '      xxx       xxxxxxxx         xxxxxx           ',
             '                                                  ',
             'xxxx                                              ',
-            '                           v          xxxx       ',
-            '                                                  ',
+            '                           v          xxxx        ',
+            '                                                  ', 
+        ],
+        [   
            
-        ]
+            '                                                    ',
+            'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ',
+            'x                                                 x ',
+            'x   u                                             x ',
+            'x                                                 x ',
+            'x                                                 x ',
+            'x                                                 x ',
+            'x                                                 x ',
+            'x                                                 x ',
+            'x                                                 x ',
+            'x                                                 x ',
+            'x                                                 x ',
+            'x             =%=%=%====         %=%=%=%=%=%=     x ',
+            'x                                                 x ',
+            'x                                                 x ',
+            'x    =*=%=%==  ===%=%=%    $    =%=%=%===%=%=%    x ',
+            'x                        $   $                  n x ',
+            'x    $$$$$$$$$$$$$$$$$$$$      $$$$$$$$$$$$$      x ',
+            'xxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxxx ',
+        ],
     ]
-
+    let levelSound = null;
+    const soundArray=['main','sky', 'underground']
+    const determineMusic = ()=>{
+        if(level > -1){
+           levelSound = play(soundArray[level])
+        } else{
+            levelSound = null
+        }
+    }
     const levelConfig = {
         width: 20,
         height: 20,
+        //red objects
         '=' : [sprite( 'block'), solid(), 'nonMovable', 'breakable'],
         'x' : [sprite( 'brick') , solid(), 'nonMovable'],
         '^' : [sprite( 'shroom1'), solid(), body(), 'dangerous'],
@@ -85,15 +133,19 @@ scene('game', ({level, score}) => {
         '*' : [sprite( 'prize'), solid(),'mushroom-prize'],
         '~' : [sprite( 'mushroom'), body(), 'mushroom'],
         '!' : [sprite('blocked'), solid()], 
-        'n' : [sprite('pipe'), solid(), color(20, 20, 100),'nextLevel'] 
+        'n' : [sprite('pipe'), solid(), color(20, 20, 100),'nextLevel'],
+        'u' : [sprite( 'pipe'), solid(),scale(1), rotate(3.15)], 
+
+        //blue objects
+        // '{' : [sprite( 'blueBlock' ), solid()]
 
     }
 
-    const gameLevel = addLevel(maps[1], levelConfig)
+    const gameLevel = addLevel(maps[level], levelConfig)
 
     const scoreLabel = add([
         text(score, 10),
-        pos(camPos(30, 6)),
+        pos(30, 6),
         layer('ui'),
         {
             value: score
@@ -101,34 +153,41 @@ scene('game', ({level, score}) => {
     ])
 
     add([
-        text('level ' + parseInt(level + 1), 10), pos(50, 6)
+        text('level ' + parseInt(level + 1), 10), pos(100, 6)
     ])
 
-    const big = ()=>{
+    const big = ()=>{  
+        
         return{
             smallify(){
-                this.scale = vec2(1)
+                player.scale = vec2(1)
                 currentJumpForce = jumpForce
                 isBig = false
                 canBreak = false
             },
             biggify(){
-                this.scale = vec2(1.5)
+                player.scale = vec2(1.5)
                 currentJumpForce = bigJumpForce
                 isBig = true
                 canBreak= true
             }
         }
     }
-    const enemy = get('dangerous')
 
     const player = add([
         sprite('mario'), solid(),
-        pos(30, 0),
+        pos(50, 100),
         body(),
-        big(),  
+        big(),
+        determineMusic(), 
         origin('bot')
     ])
+
+    action(player,(isBig)=>{
+        if(isBig){
+            player.biggify()
+        }
+    })
 
     action('mushroom', (m) => {
         m.move(30, 0)
@@ -152,6 +211,12 @@ scene('game', ({level, score}) => {
     player.action(()=>{
         camPos(player.pos)
         if(player.pos.y >= fallDeath){
+            levelSound.stop()
+            play('gameOver', {
+                volume: 1.0,
+                speed: 0.8,
+                detune: 1200
+            })
             go('lose', {score: scoreLabel.value})
         }
     })
@@ -171,17 +236,32 @@ scene('game', ({level, score}) => {
         if(obj.is('breakable')){
             if(canBreak){
                 destroy(obj)
-            }
+                play('breakBlock', {
+                    volume: 1.0,
+                    speed: 0.8,
+                    detune: 1200
+                })
+            } 
         }
     })
 
     player.collides('mushroom', (m)=>{
         player.biggify()
+        play('powerUp', {
+            volume: 1.0,
+            speed: 0.8,
+            detune: 1200
+        })
         destroy(m)
         
     })
     player.collides('coin', (c)=>{
         destroy(c)
+        play('coinSound', {
+            volume: 1.0,
+            speed: 0.8,
+            detune: 1200
+        })
         scoreLabel.value++
         scoreLabel.text = scoreLabel.value
     })
@@ -189,6 +269,12 @@ scene('game', ({level, score}) => {
     player.collides('dangerous', (d) =>{
         if(isJumping){
             destroy(d)
+            play('stomp', {
+                volume: 1,
+                speed: 0.8,
+                detune: 1200
+            })
+            player.jump(200)
             scoreLabel.value++
             scoreLabel.text = scoreLabel.value
         }else if(isBig){
@@ -196,15 +282,28 @@ scene('game', ({level, score}) => {
             destroy(d)
         }else{
             go('lose', {score: scoreLabel.value})
+            levelSound.stop()
+            play('dies', {
+                volume: 1.0,
+                speed: 0.8,
+                detune: 1200
+            })
         }
     })
 
     player.collides('nextLevel', ()=>{
         keyDown('down', ()=>{
+            play('downPipe', {
+                volume: 1.0,
+                speed: 0.8,
+                detune: 1200
+            })
+            levelSound.stop()
+            
             go('game', {
-                level: (level + 1),
+                level: (level + 1) % maps.length,
                 score: scoreLabel.value,
-                isBig: isBig
+                
             })
         })
     })
@@ -219,12 +318,19 @@ scene('game', ({level, score}) => {
     player.action(()=>{
         if(player.grounded()){
             isJumping = false
-        }
+        }else[
+            isJumping = true
+        ]
     })
     keyDown('space', ()=>{
         if(player.grounded()){
             isJumping=true
             player.jump(currentJumpForce)
+            play('bigJump', {
+                volume: 1.0,
+                speed: 0.8,
+                detune: 1200
+            })
             
         };
     })
