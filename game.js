@@ -59,6 +59,8 @@ loadSound('main', 'mainMario.mp3')
 loadSound('sky', 'theSky.mp3');
 loadSound('underground', 'underGround.mp3')
 loadSound('stomp', 'stomp.wav')
+loadSound('finalMap', 'finalMap.mp3')
+loadSound('bonusSound', 'bonusSound.mp3')
 
 
 scene('game', ({level, score}) => {
@@ -233,7 +235,7 @@ scene('game', ({level, score}) => {
     ]
     let levelSound = null;
     const backgroundArray=['levelOneBackground', 'skyImage', 'undergroundBackground','brickBackground'];
-    const soundArray=['main','sky', 'underground', 'finalMap.mp3', 'bonusSound.mp3']
+    const soundArray=['main','sky', 'underground', 'finalMap', 'bonusSound']
     const determineLevelEffects = ()=>{
         add([
             sprite(backgroundArray[level]),
@@ -353,6 +355,7 @@ scene('game', ({level, score}) => {
     })
     player.action(()=>{
         camPos(player.pos)
+        camScale(2)
         if(player.pos.y >= fallDeath){
             levelSound.stop()
             play('gameOver', {
