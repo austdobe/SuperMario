@@ -84,7 +84,7 @@ scene('game', ({level, score}) => {
             '          *%          xxxx       xxxxxx                                                                   ',
             '                                                                                          xxxxxx          ',
             '                                         xxxxx                                                            ',
-            '     %  =====                        xxxxxxxx                                      ^                      ',
+            '     %  =====                        xxxxxxxx                                                             ',
             '                  o                 xxxxxxxxxx                                 xxxxxxxxx                  ',
             'xxx             ^            x   ^xxxxxxxxxxxxxxxx           x       ^         x                          ',
             'xxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxx                          ',
