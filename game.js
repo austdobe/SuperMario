@@ -6,8 +6,8 @@ kaboom({
     debug: true,
     clearColor: [0,0,0,1]
 })
-
-const moveSpeed = 100;
+let startSpeed = 0;
+let moveSpeed = 100;
 const jumpForce = 360;
 const bigJumpForce = 550
 let currentJumpForce = jumpForce 
@@ -42,6 +42,8 @@ loadSprite('bluePrize', 'bluePrize.png')
 loadSprite('blueShroom', 'blueShroom.png')
 loadSprite('water', 'water.png')
 loadSprite('jumpingFish', 'fishRight.png')
+loadSprite('bonusBackground', 'bonusBackground.png')
+
 
 
 //Sounds
@@ -234,7 +236,7 @@ scene('game', ({level, score}) => {
         ],
     ]
     let levelSound = null;
-    const backgroundArray=['levelOneBackground', 'skyImage', 'undergroundBackground','brickBackground'];
+    const backgroundArray=['levelOneBackground', 'skyImage', 'undergroundBackground','brickBackground', 'bonusBackground'];
     const soundArray=['main','sky', 'underground', 'finalMap', 'bonusSound']
     const determineLevelEffects = ()=>{
         add([
@@ -464,6 +466,15 @@ scene('game', ({level, score}) => {
 
     player.collides('nextLevel', ()=>{
         keyDown('down', ()=>{
+            if(player.collides('castle')){
+                play('stageClear', {
+                    volume: 1.0,
+                    speed: 0.8,
+                    detune: 1200
+                })
+                levelSound.stop()
+                
+            }else{
             play('downPipe', {
                 volume: 1.0,
                 speed: 0.8,
@@ -474,16 +485,33 @@ scene('game', ({level, score}) => {
             go('game', {
                 level: (level + 1) % maps.length,
                 score: scoreLabel.value,
+                isBig: isBig
                 
             })
-        })
+        }})
     })
        
     keyDown('left', ()=>{
-        player.move(-moveSpeed, 0);
+        if(player.moveSpeed <  150){
+            player.move(-moveSpeed, 0);
+        }else{
+            player.move(startSpeed++)
+        }
     })
     keyDown('right', ()=>{
-        player.move(moveSpeed, 0);
+        if(player.moveSpeed =  100){
+            player.move(moveSpeed, 0);
+        }else{
+            player.move(startSpeed++)
+        }
+    
+    })
+    keyRelease('left', ()=>{
+        player.move(-moveSpeed++)
+    })
+    keyRelease('right', ()=>{
+        player.move(moveSpeed--, 0)
+    
     })
 
     player.action(()=>{
