@@ -1,8 +1,8 @@
 kaboom({
     global: true,
-    fullscreen: true,
     scale: 1,
-    crisp:true,
+    fullscreen: true,
+    crisp:false,
     debug: true,
     clearColor: [0,0,0,1]
 })
@@ -11,12 +11,19 @@ let moveSpeed = 100;
 const jumpForce = 360;
 const bigJumpForce = 550
 let currentJumpForce = jumpForce 
-let canBreak = false
 let isJumping = true;
 let isBig=false;
+let canBreak = false
 let enemyXSpeed = -20;
 let enemyYSpeed = -20;
 const fallDeath = 1000;
+let levelSound = null;
+const backgroundArray=['levelOneBackground', 'skyImage', 'undergroundBackground','brickBackground', 'bonusBackground'];
+const soundArray=['main','sky', 'underground', 'finalMap', 'bonusSound', 'credits']
+const rightBtn = document.getElementById('right')
+const leftBtn = document.getElementById('left')
+const jumpBtn = document.getElementById('jump')
+const actionBtn = document.getElementById('action')
 //Sprites
 loadRoot('./images/')
 loadSprite( 'coin' , 'coin.png' )
@@ -43,6 +50,10 @@ loadSprite('blueShroom', 'blueShroom.png')
 loadSprite('water', 'water.png')
 loadSprite('jumpingFish', 'fishRight.png')
 loadSprite('bonusBackground', 'bonusBackground.png')
+loadSprite('rightArrow', 'rightArrow.png')
+loadSprite('leftArrow', 'leftArrow.png')
+loadSprite('jumpArrow', 'jumpArrow.png')
+loadSprite('actionArrow', 'actionArrow.png')
 
 
 
@@ -63,11 +74,12 @@ loadSound('underground', 'underGround.mp3')
 loadSound('stomp', 'stomp.wav')
 loadSound('finalMap', 'finalMap.mp3')
 loadSound('bonusSound', 'bonusSound.mp3')
+loadSound('ending', 'ending.mp3')
+loadSound('credits', 'credits.mp3')
 
 
 scene('game', ({level, score}) => {
     layers(['bg', 'obj', 'ui'], 'obj' )
-
     const maps =[
         [
             '                                                                                                          ',
@@ -235,9 +247,7 @@ scene('game', ({level, score}) => {
            
         ],
     ]
-    let levelSound = null;
-    const backgroundArray=['levelOneBackground', 'skyImage', 'undergroundBackground','brickBackground', 'bonusBackground'];
-    const soundArray=['main','sky', 'underground', 'finalMap', 'bonusSound']
+    
     const determineLevelEffects = ()=>{
         add([
             sprite(backgroundArray[level]),
@@ -271,6 +281,7 @@ scene('game', ({level, score}) => {
         'u' : [sprite( 'pipe'), solid(),scale(1), rotate(3.15)],
         'c' : [sprite('cloudBlock'), scale(2), solid(), 'nonMovable'],
         'h' : [sprite( 'castle'), scale(1.5), 'castle', 'nextLevel'],
+        'g' : [sprite('pipe'), solid(), color(20, 20, 100),'win'],
         
         //blue objects
         'm' : [sprite('blueMetal'), solid(), scale(0.5), 'nonMovable'],
@@ -301,39 +312,42 @@ scene('game', ({level, score}) => {
     add([
         text('level ' + parseInt(level + 1), 10), pos(100, 6)
     ])
+    // add([
+    //     sprite('rightArrow'),
+    //     layer('ui'),
+    //     origin('botright'),
+    //     pos(100, 6)
+    // ])
 
-    const big = ()=>{  
+    // const big = ()=>{  
         
-        return{
-            smallify(){
-                player.scale = vec2(1)
-                currentJumpForce = jumpForce
-                isBig = false
-                canBreak = false
-            },
-            biggify(){
-                player.scale = vec2(1.5)
-                currentJumpForce = bigJumpForce
-                isBig = true
-                canBreak= true
-            }
-        }
-    }
+        // return{
+    // const smallify = ()=>{
+    //             player.scale = vec2(1)
+    //             currentJumpForce = jumpForce
+    //             isBig = false
+    //             canBreak = false
+    //         },
+    // const biggify = ()=>{
+    //             player.scale = vec2(1.5)
+    //             currentJumpForce = bigJumpForce
+    //             isBig = true
+    //             canBreak= true
+    //         }
+    //     }
+    // }
+    
+          
 
     const player = add([
         sprite('mario'), solid(),
         pos(50, 100),
         body(),
-        big(),
+        // big(),
         determineLevelEffects(), 
         origin('bot')
     ])
 
-    action(player,(isBig)=>{
-        if(isBig){
-            player.biggify()
-        }
-    })
 
     action('mushroom', (m) => {
         m.move(30, 0)
@@ -357,7 +371,7 @@ scene('game', ({level, score}) => {
     })
     player.action(()=>{
         camPos(player.pos)
-        camScale(2)
+        camScale(1)
         if(player.pos.y >= fallDeath){
             levelSound.stop()
             play('gameOver', {
@@ -366,6 +380,11 @@ scene('game', ({level, score}) => {
                 detune: 1200
             })
             go('lose', {score: scoreLabel.value})
+            // play(soundArray[5], {
+            //     volume: 1.0,
+            //     speed: 0.8,
+            //     detune: 1200
+            // })
         }
     })
 
@@ -399,7 +418,10 @@ scene('game', ({level, score}) => {
     })
 
     player.collides('mushroom', (m)=>{
-        player.biggify()
+        isBig = true;
+        player.scale = vec2(1.5)
+        currentJumpForce = bigJumpForce
+        canBreak= true
         play('powerUp', {
             volume: 1.0,
             speed: 0.8,
@@ -441,7 +463,10 @@ scene('game', ({level, score}) => {
             scoreLabel.value++
             scoreLabel.text = scoreLabel.value
         }else if(isBig){
-            player.smallify()
+            player.scale = vec2(1)
+            currentJumpForce = jumpForce
+            isBig = false
+            canBreak = false
             destroy(d)
         }else{
             go('lose', {score: scoreLabel.value})
@@ -451,6 +476,7 @@ scene('game', ({level, score}) => {
                 speed: 0.8,
                 detune: 1200
             })
+            
         }
     })
 
@@ -462,6 +488,11 @@ scene('game', ({level, score}) => {
                 speed: 0.8,
                 detune: 1200
             })
+            // play(soundArray[5], {
+            //     volume: 1.0,
+            //     speed: 0.8,
+            //     detune: 1200
+            // })
     })
 
     player.collides('nextLevel', ()=>{
@@ -489,30 +520,75 @@ scene('game', ({level, score}) => {
                 
             })
         }})
+        keyDown('s', ()=>{
+            if(player.collides('castle')){
+                play('stageClear', {
+                    volume: 1.0,
+                    speed: 0.8,
+                    detune: 1200
+                })
+                levelSound.stop()
+
+                go('game', {
+                    level: (level + 1) % maps.length,
+                    score: scoreLabel.value,
+                    isBig: isBig
+                    
+                })
+                
+            }else if(player.collides('win')){
+               
+                levelSound.stop()
+
+                go('win', {score: scoreLabel.value})
+                // play(soundArray[5], {
+                //     volume: 1.0,
+                //     speed: 0.8,
+                //     detune: 1200
+                // })
+                
+            
+            }else{
+                play('downPipe', {
+                    volume: 1.0,
+                    speed: 0.8,
+                    detune: 1200
+                   
+            })
+
+                levelSound.stop()
+                
+                go('game', {
+                    level: (level + 1) % maps.length,
+                    score: scoreLabel.value,
+                    isBig: isBig
+                    
+                })
+            }
+        })
     })
        
     keyDown('left', ()=>{
-        if(player.moveSpeed <  150){
-            player.move(-moveSpeed, 0);
-        }else{
-            player.move(startSpeed++)
-        }
+       moveSpeed = 150;
+        player.move(-moveSpeed, 0)
+
     })
     keyDown('right', ()=>{
-        if(player.moveSpeed =  100){
-            player.move(moveSpeed, 0);
-        }else{
-            player.move(startSpeed++)
-        }
-    
+        moveSpeed = 150
+        player.move(moveSpeed, 0)
+        
+         
     })
-    keyRelease('left', ()=>{
-        player.move(-moveSpeed++)
-    })
-    keyRelease('right', ()=>{
-        player.move(moveSpeed--, 0)
-    
-    })
+    keyDown('a', ()=>{
+        moveSpeed = 150;
+         player.move(-moveSpeed, 0)
+ 
+     })
+     keyDown('d', ()=>{
+         moveSpeed = 150
+         player.move(moveSpeed, 0);
+          
+     })
 
     player.action(()=>{
         if(player.grounded()){
@@ -521,7 +597,31 @@ scene('game', ({level, score}) => {
             isJumping = true
         ]
     })
-    keyDown('space', ()=>{
+    keyPress('space', ()=>{
+        if(player.grounded()){
+            isJumping=true
+            player.jump(currentJumpForce)
+            play('bigJump', {
+                volume: 1.0,
+                speed: 0.8,
+                detune: 1200
+            })
+            
+        };
+    })
+    keyPress('up', ()=>{
+        if(player.grounded()){
+            isJumping=true
+            player.jump(currentJumpForce)
+            play('bigJump', {
+                volume: 1.0,
+                speed: 0.8,
+                detune: 1200
+            })
+            
+        };
+    })
+    keyPress('w', ()=>{
         if(player.grounded()){
             isJumping=true
             player.jump(currentJumpForce)
@@ -534,35 +634,129 @@ scene('game', ({level, score}) => {
         };
     })
     
+    // mouseDown(rightBtn, ()=>{
+    //     player.move(moveSpeed, 0)
+    // }) 
+
+
+    // mouseDown(leftBtn, ()=>{
+    //     player.move(-moveSpeed, 0)
+    // }) 
+
+    // mouseDown(jumpBtn, ()=>{
+    //     if(player.grounded()){
+    //         isJumping=true
+    //         player.jump(currentJumpForce)
+    //         play('bigJump', {
+    //             volume: 1.0,
+    //             speed: 0.8,
+    //             detune: 1200
+    //         }) 
+    //     }    
+    // }) 
+
+    // mouseDown(actionBtn, ()=>{
+    //     if(player.collides('castle')){
+    //         play('stageClear', {
+    //             volume: 1.0,
+    //             speed: 0.8,
+    //             detune: 1200
+    //         })
+    //         levelSound.stop()
+
+    //         go('game', {
+    //             level: (level + 1) % maps.length,
+    //             score: scoreLabel.value,
+    //             isBig: isBig
+                
+    //         })
+            
+    //     }else{
+    //         play('downPipe', {
+    //             volume: 1.0,
+    //             speed: 0.8,
+    //             detune: 1200
+                
+    //     })
+
+    //         levelSound.stop()
+            
+    //         go('game', {
+    //             level: (level + 1) % maps.length,
+    //             score: scoreLabel.value,
+    //             isBig: isBig
+                
+    //         })
+    //     }
+    // }) 
+ 
 })
 
 scene('lose', ({score})=>{
-    add([text("You lose!", 32), origin('left'), pos(width()/4, height()/4)]),
-    add([text("You had a score of " + score, 32), pos(width()/4, height()/4 + 100)])
-    const redo = add([
-        text('"click" mouse or hit "space" to play again', 24),
-        origin('left'), 
-        pos(width()/4, height()/4 + 250),
-        color(100, 100, 100)
-    ])
+    const credit = play('credits', {
+        volume: 1.0,
+        speed: 0.8,
+        detune: 1200
+    })
+
+    add([text("You Lost", 24), origin('bot'), pos(width()/2, height()), 'credits'], credit),
+    add([text("You had a score of " + score, 24), origin('bot'), pos(width()/2, height() + 100), 'credits'])
+    add([sprite('mario'), scale(2), origin('bot'), pos(width()/8, height() + 50), 'credits'])
+    add([sprite('shroom1'), scale(2), origin('bot'), pos(width() - 200, height() + 150), 'credits'])
+    add([text("This game was developed by Austin Dober", 24), origin('bot'), pos(width()/2, height() + 200), 'credits'])
+    add([text("Coded using Kaboom.js", 24), origin('bot'), pos(width()/2, height() + 300), 'credits'])
+    add([sprite('castle'), scale(2), origin('bot'), pos(width()/8, height() + 250), 'credits'])
+    add([sprite('bug'), scale(0.5), origin('bot'), pos(width() - 200, height() + 450), 'credits'])
+    add([text("Deployed using Github Pages", 24), origin('bot'), pos(width()/2, height() + 400), 'credits'])
+    add([sprite('blueShroom'), scale(1), origin('bot'), pos(width()/8, height() + 550), 'credits'])
+    add([sprite('mushroom'), scale(2), origin('bot'), pos(width() - 200, height() + 700), 'credits'])
+    add([text("See my portfolio @ austdobe.github.io, link is on landing page", 24), origin('bot'), pos(width()/2, height() + 500), 'credits'])
+    add([text('Press "space" or "click" to play again', 24), origin('center'), pos(width()/2, height() + 600), 'credits'])
+    add([text("Thanks for playing!", 24), origin('bot'), pos(width()/2, height() + 700), 'credits'])
+    
+    action('credits', (m) => {
+        m.move(0, -50)
+       
+    })
+
+    keyDown('space', ()=>{
+        credit.stop()
+        go('game', {level: 0, score:0})
+    })
+    mouseRelease(()=>{
+        credit.stop()
+        go('game', {level: 0, score:0})
+    })
+})
+ 
+scene('win', ({score})=>{
+    add([text("Congrats!!! You win!", 24), origin('bot'), pos(width()/2, height()), 'credits']),
+    add([text("You had a score of " + score, 24), origin('bot'), pos(width()/2, height() + 100), 'credits'])
+    add([sprite('mario'), scale(2), origin('bot'), pos(width()/8, height() + 50), 'credits'])
+    add([sprite('shroom1'), scale(2), origin('bot'), pos(width() - 200, height() + 150), 'credits'])
+    add([text("This game was developed by Austin Dober", 24), origin('bot'), pos(width()/2, height() + 200), 'credits'])
+    add([text("Coded using Kaboom.js", 24), origin('bot'), pos(width()/2, height() + 300), 'credits'])
+    add([sprite('castle'), scale(2), origin('bot'), pos(width()/8, height() + 250), 'credits'])
+    add([sprite('bug'), scale(0.5), origin('bot'), pos(width() - 200, height() + 450), 'credits'])
+    add([text("Deployed using Github Pages", 24), origin('bot'), pos(width()/2, height() + 400), 'credits'])
+    add([sprite('blueShroom'), scale(1), origin('bot'), pos(width()/8, height() + 550), 'credits'])
+    add([sprite('mushroom'), scale(2), origin('bot'), pos(width() - 200, height() + 700), 'credits'])
+    add([text("See my portfolio @ austdobe.github.io, link is on landing page", 24), origin('bot'), pos(width()/2, height() + 500), 'credits'])
+    add([text('Press "space" or "click" to play again', 24), origin('center'), pos(width()/2, height() + 600), 'credits'])
+    add([text("Thanks for playing!", 24), origin('bot'), pos(width()/2, height() + 700), 'credits'])
+    action('credits', (m) => {
+        m.move(0, -50)
+       
+    })
 
     keyDown('space', ()=>{
         go('game', {level: 0, score:0})
+        
     })
     mouseRelease(()=>{
         go('game', {level: 0, score:0})
     })
 })
- 
-const setControllers=()=>{
-    const controller = document.getElementById('controller')
-    const rightArrow = document.createElement('button')
-    const leftArrow = document.createElement('button')
-    const spaceBar = document.createElement('button')
-    rightArrowClass.createAttribute('class')
-    rightArrowClass.value ="fas fa-long-arrow-alt-right"
-    rightArrow.setAttributeNode(rightArrowClass)
-    controller.appendChild(rightArrow)
-}
+
 
 start('game', {level: 0, score:0})
