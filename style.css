@@ -115,6 +115,9 @@
   
     nav {
         max-width: 100%;
+        
+    }
+    .navbar{
         height: fit-content;
         text-align: center;
     }
