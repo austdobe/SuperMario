@@ -188,14 +188,7 @@ scene('game', ({level, score}) => {
             'p       b      pppp             pppp                                                                    p', 
             'pppppppppppppppppppppppppppppppppppppppppppppppppppppp                                       pppppppppppp', 
             'ppppppppppppppppppppppppppppppppppppppppppppppppppppppwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwpppppppppppp', 
-            'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
-            'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
-            'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
-            'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
-            'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
-            'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
-            'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
-
+            
         ],
         [
             '                                                                                  ',
@@ -354,6 +347,7 @@ scene('game', ({level, score}) => {
         origin('bot')
         
     ])
+   
 
 
     action('mushroom', (m) => {
@@ -598,6 +592,7 @@ scene('game', ({level, score}) => {
         player.move(-moveSpeed, 0)
 
     })
+    
     keyRelease('left',()=>{
         player.changeSprite('mario')
     })
@@ -613,6 +608,7 @@ scene('game', ({level, score}) => {
         player.move(-moveSpeed, 0)
  
     })
+    
     keyRelease('a',()=>{
         player.changeSprite('mario')
     })
@@ -627,9 +623,11 @@ scene('game', ({level, score}) => {
         }
             player.move(moveSpeed, 0)
     })
+    
     keyRelease('d',()=>{
         player.changeSprite('mario')
     })
+    
     keyDown('right', ()=>{
     moveSpeed = 150
         if(isJumping){
@@ -640,17 +638,17 @@ scene('game', ({level, score}) => {
         }
             player.move(moveSpeed, 0)         
     })
+    
     keyRelease('right',()=>{
         player.changeSprite('mario')
     })
+    
     player.on('grounded',()=>{
         
         player.changeSprite('mario')
         
     })
-    player.on(!'moving', ()=>{
-        player.changeSprite('mario')
-    })
+    
 
     player.action(()=>{
         
