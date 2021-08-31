@@ -371,7 +371,7 @@ scene('game', ({level, score}) => {
     })
     player.action(()=>{
         camPos(player.pos)
-        camScale(1)
+        camScale(2)
         if(player.pos.y >= fallDeath){
             levelSound.stop()
             play('gameOver', {
@@ -698,26 +698,35 @@ scene('lose', ({score})=>{
         speed: 0.8,
         detune: 1200
     })
-
-    add([text("You Lost", 24), origin('bot'), pos(width()/2, height()), 'credits'], credit),
-    add([text("You had a score of " + score, 24), origin('bot'), pos(width()/2, height() + 100), 'credits'])
+    // add([text('Up/Down controls credits', 16), origin('bot'), pos(width()/9, height())])
+    add([text("You Lost", 20), origin('bot'), pos(width()/2, height()), 'credits'], credit),
+    add([text("You had a score of " + score, 20), origin('bot'), pos(width()/2, height() + 100), 'credits'])
     add([sprite('mario'), scale(2), origin('bot'), pos(width()/8, height() + 50), 'credits'])
     add([sprite('shroom1'), scale(2), origin('bot'), pos(width() - 200, height() + 150), 'credits'])
-    add([text("This game was developed by Austin Dober", 24), origin('bot'), pos(width()/2, height() + 200), 'credits'])
-    add([text("Coded using Kaboom.js", 24), origin('bot'), pos(width()/2, height() + 300), 'credits'])
+    add([text("This game was developed by Austin Dober", 20), origin('bot'), pos(width()/2, height() + 200), 'credits'])
+    add([text("Coded using Kaboom.js", 20), origin('bot'), pos(width()/2, height() + 300), 'credits'])
     add([sprite('castle'), scale(2), origin('bot'), pos(width()/8, height() + 250), 'credits'])
     add([sprite('bug'), scale(0.5), origin('bot'), pos(width() - 200, height() + 450), 'credits'])
-    add([text("Deployed using Github Pages", 24), origin('bot'), pos(width()/2, height() + 400), 'credits'])
-    add([sprite('blueShroom'), scale(1), origin('bot'), pos(width()/8, height() + 550), 'credits'])
-    add([sprite('mushroom'), scale(2), origin('bot'), pos(width() - 200, height() + 700), 'credits'])
-    add([text("See my portfolio @ austdobe.github.io, link is on landing page", 24), origin('bot'), pos(width()/2, height() + 500), 'credits'])
-    add([text('Press "space" or "click" to play again', 24), origin('center'), pos(width()/2, height() + 600), 'credits'])
-    add([text("Thanks for playing!", 24), origin('bot'), pos(width()/2, height() + 700), 'credits'])
+    add([text("Deployed using Github Pages", 20), origin('bot'), pos(width()/2, height() + 400), 'credits'])
+    add([sprite('blueShroom'), scale(1), origin('bot'), pos(width()/8, height() + 425), 'credits'])
+    add([sprite('mushroom'), scale(2), origin('bot'), pos(width() - 200, height() + 600), 'credits'])
+    add([text("See my portfolio @ austdobe.github.io, link is on landing page", 20), origin('bot'), pos(width()/2, height() + 500), 'credits'])
+    add([sprite('prize'), scale(2), origin('bot'), pos(width()/8, height() + 700), 'credits'])
+    add([text('Press "space" or "click" to play again', 20), origin('center'), pos(width()/2, height() + 600), 'credits'])
+    add([text("Thanks for playing!", 20), origin('bot'), pos(width()/2, height() + 700), 'credits'])
     
     action('credits', (m) => {
         m.move(0, -50)
+        keyDown('down', ()=>{
+            m.move(0, 1)
+        })
+        keyDown('up', ()=>{
+            m.move(0, -1)
+        })
        
     })
+
+   
 
     keyDown('space', ()=>{
         credit.stop()
@@ -730,30 +739,47 @@ scene('lose', ({score})=>{
 })
  
 scene('win', ({score})=>{
-    add([text("Congrats!!! You win!", 24), origin('bot'), pos(width()/2, height()), 'credits']),
-    add([text("You had a score of " + score, 24), origin('bot'), pos(width()/2, height() + 100), 'credits'])
+    const credit = play('credits', {
+        volume: 1.0,
+        speed: 0.8,
+        detune: 1200
+    })
+    // add([text('Up/Down controls credits', 16), origin('bot'), pos(width()/9, height())])
+    add([text("Congrats, You won!!", 20), origin('bot'), pos(width()/2, height()), 'credits'], credit),
+    add([text("You had a score of " + score, 20), origin('bot'), pos(width()/2, height() + 100), 'credits'])
     add([sprite('mario'), scale(2), origin('bot'), pos(width()/8, height() + 50), 'credits'])
     add([sprite('shroom1'), scale(2), origin('bot'), pos(width() - 200, height() + 150), 'credits'])
-    add([text("This game was developed by Austin Dober", 24), origin('bot'), pos(width()/2, height() + 200), 'credits'])
-    add([text("Coded using Kaboom.js", 24), origin('bot'), pos(width()/2, height() + 300), 'credits'])
+    add([text("This game was developed by Austin Dober", 20), origin('bot'), pos(width()/2, height() + 200), 'credits'])
+    add([text("Coded using Kaboom.js", 20), origin('bot'), pos(width()/2, height() + 300), 'credits'])
     add([sprite('castle'), scale(2), origin('bot'), pos(width()/8, height() + 250), 'credits'])
     add([sprite('bug'), scale(0.5), origin('bot'), pos(width() - 200, height() + 450), 'credits'])
-    add([text("Deployed using Github Pages", 24), origin('bot'), pos(width()/2, height() + 400), 'credits'])
-    add([sprite('blueShroom'), scale(1), origin('bot'), pos(width()/8, height() + 550), 'credits'])
-    add([sprite('mushroom'), scale(2), origin('bot'), pos(width() - 200, height() + 700), 'credits'])
-    add([text("See my portfolio @ austdobe.github.io, link is on landing page", 24), origin('bot'), pos(width()/2, height() + 500), 'credits'])
-    add([text('Press "space" or "click" to play again', 24), origin('center'), pos(width()/2, height() + 600), 'credits'])
-    add([text("Thanks for playing!", 24), origin('bot'), pos(width()/2, height() + 700), 'credits'])
+    add([text("Deployed using Github Pages", 20), origin('bot'), pos(width()/2, height() + 400), 'credits'])
+    add([sprite('blueShroom'), scale(1), origin('bot'), pos(width()/8, height() + 425), 'credits'])
+    add([sprite('mushroom'), scale(2), origin('bot'), pos(width() - 200, height() + 600), 'credits'])
+    add([text("See my portfolio @ austdobe.github.io, link is on landing page", 20), origin('bot'), pos(width()/2, height() + 500), 'credits'])
+    add([sprite('prize'), scale(2), origin('bot'), pos(width()/8, height() + 700), 'credits'])
+    add([text('Press "space" or "click" to play again', 20), origin('center'), pos(width()/2, height() + 600), 'credits'])
+    add([text("Thanks for playing!", 20), origin('bot'), pos(width()/2, height() + 700), 'credits'])
+    
     action('credits', (m) => {
         m.move(0, -50)
+        keyDown('down', ()=>{
+            m.move(0, 1)
+        })
+        keyDown('up', ()=>{
+            m.move(0, -1)
+        })
        
     })
 
+   
+
     keyDown('space', ()=>{
+        credit.stop()
         go('game', {level: 0, score:0})
-        
     })
     mouseRelease(()=>{
+        credit.stop()
         go('game', {level: 0, score:0})
     })
 })
