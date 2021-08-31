@@ -13,7 +13,6 @@ const bigJumpForce = 550
 let currentJumpForce = jumpForce 
 let isJumping = true;
 let isBig=false;
-let canBreak = false
 let enemyXSpeed = -20;
 let enemyYSpeed = -20;
 const fallDeath = 1000;
@@ -262,8 +261,8 @@ scene('game', ({level, score}) => {
         }
     }
     const levelConfig = {
-        width: 20,
-        height: 20,
+        width: 18,
+        height: 18,
         //red objects
         '=' : [sprite( 'block'), solid(), 'nonMovable', 'breakable'],
         'x' : [sprite( 'brick') , solid(), 'nonMovable'],
@@ -317,23 +316,21 @@ scene('game', ({level, score}) => {
     //     pos(100, 6)
     // ])
 
-    // const big = ()=>{  
-        
-        // return{
-    // const smallify = ()=>{
-    //             player.scale = vec2(1)
-    //             currentJumpForce = jumpForce
-    //             isBig = false
-    //             canBreak = false
-    //         },
-    // const biggify = ()=>{
-    //             player.scale = vec2(1.5)
-    //             currentJumpForce = bigJumpForce
-    //             isBig = true
-    //             canBreak= true
-    //         }
-    //     }
-    // }
+     
+            // const smallify = ()=>{
+            //     player.scale = vec2(1),
+            //     currentJumpForce = jumpForce,
+            //     isBig = false,
+               
+            // }
+            // const biggify = ()=>{
+            //     player.scale = vec2(1.5),
+            //     currentJumpForce = bigJumpForce,
+            //     isBig = true,
+                
+            // }
+    
+    
     
           
 
@@ -388,6 +385,15 @@ scene('game', ({level, score}) => {
             // })
         }
     })
+    player.on('update', (isBig)=>{
+        if(isBig){
+            player.scale = vec2(.6)
+            currentJumpForce = bigJumpForce
+        }else{
+            player.scale = vec2(0.33)
+            currentJumpForce = jumpForce
+        }
+    })
 
     player.on('headbump', (obj)=>{
         if(obj.is('coin-prize')){
@@ -407,7 +413,7 @@ scene('game', ({level, score}) => {
 
         }
         if(obj.is('breakable')){
-            if(canBreak){
+            if(isBig){
                 destroy(obj)
                 play('breakBlock', {
                     volume: 1.0,
@@ -420,9 +426,7 @@ scene('game', ({level, score}) => {
 
     player.collides('mushroom', (m)=>{
         isBig = true;
-        player.scale = vec2(.6)
-        currentJumpForce = bigJumpForce
-        canBreak= true
+        
         play('powerUp', {
             volume: 1.0,
             speed: 0.8,
@@ -464,10 +468,7 @@ scene('game', ({level, score}) => {
             scoreLabel.value++
             scoreLabel.text = scoreLabel.value
         }else if(isBig){
-            player.scale = vec2(0.33)
-            currentJumpForce = jumpForce
             isBig = false
-            canBreak = false
             destroy(d)
         }else{
             go('lose', {score: scoreLabel.value})
@@ -529,6 +530,7 @@ scene('game', ({level, score}) => {
             go('game', {
                 level: (level + 1) % maps.length,
                 score: scoreLabel.value,
+                isBig: false
                 
                 
             })
@@ -545,6 +547,7 @@ scene('game', ({level, score}) => {
                 go('game', {
                     level: (level + 1) % maps.length,
                     score: scoreLabel.value,
+                    isBig: false
                     
                     
                 })
@@ -574,6 +577,7 @@ scene('game', ({level, score}) => {
                 go('game', {
                     level: (level + 1) % maps.length,
                     score: scoreLabel.value,
+                    isBig: false
                     
                     
                 })
@@ -798,11 +802,11 @@ scene('lose', ({score})=>{
 
     keyDown('space', ()=>{
         credit.stop()
-        go('game', {level: 0, score:0})
+        go('game', {level: 0, score:0, isBig: false})
     })
     mouseRelease(()=>{
         credit.stop()
-        go('game', {level: 0, score:0})
+        go('game', {level: 0, score:0, isBig: false})
     })
 })
  
@@ -844,13 +848,13 @@ scene('win', ({score})=>{
 
     keyDown('space', ()=>{
         credit.stop()
-        go('game', {level: 0, score:0})
+        go('game', {level: 0, score:0, isBig: false})
     })
     mouseRelease(()=>{
         credit.stop()
-        go('game', {level: 0, score:0})
+        go('game', {level: 0, score:0, isBig: false})
     })
 })
 
 
-start('game', {level: 0, score:0})
+start('game', {level: 0, score:0, isBig: false})
