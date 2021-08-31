@@ -39,6 +39,7 @@ loadSprite('marioRight', 'marioRunningRight.png')
 loadSprite('marioLeft', 'marioRunningLeft.png')
 loadSprite('marioRJump', 'marioJumpRight.png')
 loadSprite('marioLJump', 'marioJumpLeft.png')
+loadSprite('marioSquat', 'marioSquat.png')
 loadSprite('blocked', 'prizedBlocked.png')
 loadSprite('mushroom', 'mushroom.png')
 loadSprite('bug', 'bug.png')
@@ -94,15 +95,15 @@ scene('game', ({level, score}) => {
             '                                                                                                          ',
             '                                                                                                          ',
             '                                                                                                     n    ',
-            '                                                                                                          ',
+            '                                          ====                           =====                            ',
             '                                                                                                  xxxxx   ',
-            '                                 xxxxxx                                                                   ',
+            '                                 xxxxxx         ======         =====              ====                    ',
             '                                                                                         xxxxx            ',
             '                      %%                                                                                  ',
-            '                xxx                       xxx                                                     xxxxxxxx',
+            '                xxx                       xxx            =====                =====               xxxxxxxx',
             '                                                                                                          ',
             '          *%          xxxx       xxxxxx                                                                   ',
-            '                                                                                          xxxxxx          ',
+            '                                                                     =====                xxxxxx          ',
             '                                         xxxxx                                                            ',
             '     %  =====                        xxxxxxxx                                                             ',
             '                  o                 xxxxxxxxxx                                 xxxxxxxxx                  ',
@@ -186,7 +187,7 @@ scene('game', ({level, score}) => {
             'p  n           pppp             pppp                    ppppp   ppppp   ppppppp   pppppppp              p',
             'p       b      pppp             pppp                                                                    p', 
             'pppppppppppppppppppppppppppppppppppppppppppppppppppppp                                       pppppppppppp', 
-            'ptttttttttttttttttttttttttttttttttttttttttttttttttttttwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwtttttttttttp', 
+            'ppppppppppppppppppppppppppppppppppppppppppppppppppppppwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwpppppppppppp', 
             'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
             'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
             'pwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwp',
@@ -500,6 +501,18 @@ scene('game', ({level, score}) => {
             //     detune: 1200
             // })
     })
+    keyDown('down', ()=>{
+        player.changeSprite('marioSquat')
+    })
+    keyDown('s', ()=>{
+        player.changeSprite('marioSquat')
+    })
+    keyRelease('down', ()=>{
+        player.changeSprite('mario')
+    })
+    keyRelease('s', ()=>{
+        player.changeSprite('mario')
+    })
 
     player.collides('nextLevel', ()=>{
         keyDown('down', ()=>{
@@ -576,14 +589,17 @@ scene('game', ({level, score}) => {
     // Left Move 
     keyDown('left', ()=>{
        moveSpeed = 150;
-       if(isJumping){
-       player.changeSprite('marioLJump')
+        if(isJumping){
+            player.changeSprite('marioLJump')
 
-       }else{
-           player.changeSprite('marioLeft')
-       }
+        }else{
+            player.changeSprite('marioLeft')
+        }
         player.move(-moveSpeed, 0)
 
+    })
+    keyRelease('left',()=>{
+        player.changeSprite('mario')
     })
    
     keyDown('a', ()=>{
@@ -596,29 +612,36 @@ scene('game', ({level, score}) => {
         }
         player.move(-moveSpeed, 0)
  
-        })
+    })
+    keyRelease('a',()=>{
+        player.changeSprite('mario')
+    })
     //Right Move
     keyDown('d', ()=>{
         moveSpeed = 150
         if(isJumping){
-        player.changeSprite('marioRJump')
+            player.changeSprite('marioRJump')
     
-    }else{
-        player.changeSprite('marioRight')
-    }
-        player.move(moveSpeed, 0)
+        }else{
+            player.changeSprite('marioRight')
+        }
+            player.move(moveSpeed, 0)
+    })
+    keyRelease('d',()=>{
+        player.changeSprite('mario')
     })
     keyDown('right', ()=>{
     moveSpeed = 150
-    if(isJumping){
-        player.changeSprite('marioRJump')
-    
-    }else{
-        player.changeSprite('marioRight')
-    }
-        player.move(moveSpeed, 0)
-        
-            
+        if(isJumping){
+            player.changeSprite('marioRJump')
+
+        }else{
+            player.changeSprite('marioRight')
+        }
+            player.move(moveSpeed, 0)         
+    })
+    keyRelease('right',()=>{
+        player.changeSprite('mario')
     })
     player.on('grounded',()=>{
         
