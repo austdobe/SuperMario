@@ -34,7 +34,11 @@ loadSprite( 'brick' , 'redBrick.png')
 loadSprite('pipe', 'pipe.png')
 loadSprite('castle', 'castle.png')
 loadSprite('prize', 'prizeBlock.png')
-loadSprite('mario', 'mario.png')
+loadSprite('mario', 'marioStanding.png')
+loadSprite('marioRight', 'marioRunningRight.png')
+loadSprite('marioLeft', 'marioRunningLeft.png')
+loadSprite('marioRJump', 'marioJumpRight.png')
+loadSprite('marioLJump', 'marioJumpLeft.png')
 loadSprite('blocked', 'prizedBlocked.png')
 loadSprite('mushroom', 'mushroom.png')
 loadSprite('bug', 'bug.png')
@@ -342,10 +346,12 @@ scene('game', ({level, score}) => {
     const player = add([
         sprite('mario'), solid(),
         pos(50, 100),
+        scale(0.33),
         body(),
         // big(),
         determineLevelEffects(), 
         origin('bot')
+        
     ])
 
 
@@ -419,7 +425,7 @@ scene('game', ({level, score}) => {
 
     player.collides('mushroom', (m)=>{
         isBig = true;
-        player.scale = vec2(1.5)
+        player.scale = vec2(.6)
         currentJumpForce = bigJumpForce
         canBreak= true
         play('powerUp', {
@@ -463,7 +469,7 @@ scene('game', ({level, score}) => {
             scoreLabel.value++
             scoreLabel.text = scoreLabel.value
         }else if(isBig){
-            player.scale = vec2(1)
+            player.scale = vec2(0.33)
             currentJumpForce = jumpForce
             isBig = false
             canBreak = false
@@ -516,7 +522,7 @@ scene('game', ({level, score}) => {
             go('game', {
                 level: (level + 1) % maps.length,
                 score: scoreLabel.value,
-                isBig: isBig
+                
                 
             })
         }})
@@ -532,7 +538,7 @@ scene('game', ({level, score}) => {
                 go('game', {
                     level: (level + 1) % maps.length,
                     score: scoreLabel.value,
-                    isBig: isBig
+                    
                     
                 })
                 
@@ -561,45 +567,83 @@ scene('game', ({level, score}) => {
                 go('game', {
                     level: (level + 1) % maps.length,
                     score: scoreLabel.value,
-                    isBig: isBig
+                    
                     
                 })
             }
         })
     })
-       
+    // Left Move 
     keyDown('left', ()=>{
        moveSpeed = 150;
+       if(isJumping){
+       player.changeSprite('marioLJump')
+
+       }else{
+           player.changeSprite('marioLeft')
+       }
         player.move(-moveSpeed, 0)
 
     })
-    keyDown('right', ()=>{
-        moveSpeed = 150
-        player.move(moveSpeed, 0)
-        
-         
-    })
+   
     keyDown('a', ()=>{
         moveSpeed = 150;
-         player.move(-moveSpeed, 0)
+        if(isJumping){
+            player.changeSprite('marioLJump')
+     
+        }else{
+            player.changeSprite('marioLeft')
+        }
+        player.move(-moveSpeed, 0)
  
-     })
-     keyDown('d', ()=>{
-         moveSpeed = 150
-         player.move(moveSpeed, 0);
-          
-     })
+        })
+    //Right Move
+    keyDown('d', ()=>{
+        moveSpeed = 150
+        if(isJumping){
+        player.changeSprite('marioRJump')
+    
+    }else{
+        player.changeSprite('marioRight')
+    }
+        player.move(moveSpeed, 0)
+    })
+    keyDown('right', ()=>{
+    moveSpeed = 150
+    if(isJumping){
+        player.changeSprite('marioRJump')
+    
+    }else{
+        player.changeSprite('marioRight')
+    }
+        player.move(moveSpeed, 0)
+        
+            
+    })
+    player.on('grounded',()=>{
+        
+        player.changeSprite('mario')
+        
+    })
+    player.on(!'moving', ()=>{
+        player.changeSprite('mario')
+    })
 
     player.action(()=>{
+        
         if(player.grounded()){
             isJumping = false
+            
         }else[
             isJumping = true
         ]
     })
+
+    //Jump Controls
     keyPress('space', ()=>{
         if(player.grounded()){
             isJumping=true
+            player.changeSprite('marioRJump')
             player.jump(currentJumpForce)
             play('bigJump', {
                 volume: 1.0,
@@ -612,6 +656,7 @@ scene('game', ({level, score}) => {
     keyPress('up', ()=>{
         if(player.grounded()){
             isJumping=true
+            player.changeSprite('marioRJump')
             player.jump(currentJumpForce)
             play('bigJump', {
                 volume: 1.0,
@@ -624,6 +669,7 @@ scene('game', ({level, score}) => {
     keyPress('w', ()=>{
         if(player.grounded()){
             isJumping=true
+            player.changeSprite('marioRJump')
             player.jump(currentJumpForce)
             play('bigJump', {
                 volume: 1.0,
@@ -633,6 +679,7 @@ scene('game', ({level, score}) => {
             
         };
     })
+    
     
     // mouseDown(rightBtn, ()=>{
     //     player.move(moveSpeed, 0)
