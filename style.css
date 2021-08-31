@@ -1,3 +1,5 @@
+@font-face { font-family: 'Super Mario Brothers'; src: url('tlpsmb.ttf'); }
+
 .nav{
     width: 1280px;
     height: 50px;
@@ -9,12 +11,17 @@
     text-decoration: none;
     z-index: 99;
 }
+.brand{
+    font-family: 'Super Mario Brothers';
+    font-size: 36px;
+}
 .navbar{
     height: 100px;
     background-color: antiquewhite;
     border-bottom-style: groove;
     border-bottom-left-radius: 25%;
     border-bottom-right-radius: 25%;
+      
 }
 .link:hover{
     color: grey;
@@ -108,8 +115,13 @@
   
     nav {
         max-width: 100%;
+        height: fit-content;
+        text-align: center;
     }
     .gameButtonLink{
         display: none;
+    }
+    .brand{
+        font-size: 24px;
     }
 }
