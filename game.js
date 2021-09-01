@@ -8,7 +8,7 @@ kaboom({
 })
 let startSpeed = 0;
 let moveSpeed = 100;
-const jumpForce = 360;
+const jumpForce = 550;
 const bigJumpForce = 550
 let currentJumpForce = jumpForce 
 let isJumping = true;
@@ -340,7 +340,7 @@ scene('game', ({level, score}) => {
     const player = add([
         sprite('mario'), solid(),
         pos(50, 100),
-        scale(0.33),
+        scale(0.3),
         body(),
         //
         // big(),
@@ -432,7 +432,7 @@ scene('game', ({level, score}) => {
 
     player.collides('mushroom', (m)=>{
         isBig = true;
-        player.scale = vec2(.55)
+        player.scale = vec2(.4)
         currentJumpForce = bigJumpForce
         play('powerUp', {
             volume: 1.0,
