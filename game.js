@@ -278,7 +278,7 @@ scene('game', ({level, score}) => {
         'u' : [sprite( 'pipe'), solid(),scale(1), rotate(3.15)],
         'c' : [sprite('cloudBlock'), scale(2), solid(), 'nonMovable'],
         'h' : [sprite( 'castle'), scale(1.5), 'castle', 'nextLevel'],
-        'g' : [sprite('pipe'), solid(), color(20, 20, 100),'win'],
+        'g' : [sprite('pipe'), solid(), color(20, 20, 100),'win', 'nextLevel'],
         
         //blue objects
         'm' : [sprite('blueMetal'), solid(), scale(0.5), 'nonMovable'],
@@ -309,36 +309,40 @@ scene('game', ({level, score}) => {
     add([
         text('level ' + parseInt(level + 1), 10), pos(100, 6)
     ])
-    // add([
-    //     sprite('rightArrow'),
-    //     layer('ui'),
-    //     origin('botright'),
-    //     pos(100, 6)
-    // ])
 
-     
-            // const smallify = ()=>{
-            //     player.scale = vec2(1),
-            //     currentJumpForce = jumpForce,
-            //     isBig = false,
+    // const Big = () =>{
+    //     return{
+    //         if(isBig){
+    //             player.scale = vec2(1.5),
+    //             currentJumpForce = bigJumpForce,
+    //             isBig = true,
+    //         }
+    //     }
+    // }
+        // return{
+        //     const smallify = ()=>{
+        //         player.scale = vec2(1),
+        //         currentJumpForce = jumpForce,
+        //         isBig = false,
                
-            // }
-            // const biggify = ()=>{
-            //     player.scale = vec2(1.5),
-            //     currentJumpForce = bigJumpForce,
-            //     isBig = true,
+        //     }
+        //     const biggify = ()=>{
+        //         player.scale = vec2(1.5),
+        //         currentJumpForce = bigJumpForce,
+        //         isBig = true,
                 
-            // }
+        //     }
+        // }
     
     
-    
-          
+       
 
     const player = add([
         sprite('mario'), solid(),
         pos(50, 100),
         scale(0.33),
         body(),
+        //
         // big(),
         determineLevelEffects(), 
         origin('bot')
@@ -371,6 +375,8 @@ scene('game', ({level, score}) => {
         camPos(player.pos)
         camScale(2)
         if(player.pos.y >= fallDeath){
+            isBig = false,
+            currentJumpForce = jumpForce
             levelSound.stop()
             play('gameOver', {
                 volume: 1.0,
@@ -385,15 +391,15 @@ scene('game', ({level, score}) => {
             // })
         }
     })
-    player.on('update', (isBig)=>{
-        if(isBig){
-            player.scale = vec2(.6)
-            currentJumpForce = bigJumpForce
-        }else{
-            player.scale = vec2(0.33)
-            currentJumpForce = jumpForce
-        }
-    })
+    // player.on('update', (isBig)=>{
+    //     if(isBig){
+    //         player.scale = vec2(.6)
+    //         currentJumpForce = bigJumpForce
+    //     }else{
+    //         player.scale = vec2(0.33)
+    //         currentJumpForce = jumpForce
+    //     }
+    // })
 
     player.on('headbump', (obj)=>{
         if(obj.is('coin-prize')){
@@ -426,7 +432,8 @@ scene('game', ({level, score}) => {
 
     player.collides('mushroom', (m)=>{
         isBig = true;
-        
+        player.scale = vec2(.55)
+        currentJumpForce = bigJumpForce
         play('powerUp', {
             volume: 1.0,
             speed: 0.8,
@@ -456,6 +463,10 @@ scene('game', ({level, score}) => {
         scoreLabel.text = scoreLabel.value
     })
 
+    // player.action(()=>{
+    //     player.pushOutAll();
+    // });
+
     player.collides('dangerous', (d) =>{
         if(isJumping){
             destroy(d)
@@ -469,6 +480,8 @@ scene('game', ({level, score}) => {
             scoreLabel.text = scoreLabel.value
         }else if(isBig){
             isBig = false
+            player.scale = vec2(.3)
+            currentJumpForce = jumpForce
             destroy(d)
         }else{
             go('lose', {score: scoreLabel.value})
@@ -510,32 +523,10 @@ scene('game', ({level, score}) => {
     })
 
     player.collides('nextLevel', ()=>{
+        isBig = false,
+        currentJumpForce = jumpForce
         keyDown('down', ()=>{
-            if(player.collides('castle')){
-                play('stageClear', {
-                    volume: 1.0,
-                    speed: 0.8,
-                    detune: 1200
-                })
-                levelSound.stop()
-                
-            }else{
-            play('downPipe', {
-                volume: 1.0,
-                speed: 0.8,
-                detune: 1200
-            })
-            levelSound.stop()
             
-            go('game', {
-                level: (level + 1) % maps.length,
-                score: scoreLabel.value,
-                isBig: false
-                
-                
-            })
-        }})
-        keyDown('s', ()=>{
             if(player.collides('castle')){
                 play('stageClear', {
                     volume: 1.0,
@@ -543,14 +534,6 @@ scene('game', ({level, score}) => {
                     detune: 1200
                 })
                 levelSound.stop()
-
-                go('game', {
-                    level: (level + 1) % maps.length,
-                    score: scoreLabel.value,
-                    isBig: false
-                    
-                    
-                })
                 
             }else if(player.collides('win')){
                
@@ -569,17 +552,64 @@ scene('game', ({level, score}) => {
                     volume: 1.0,
                     speed: 0.8,
                     detune: 1200
+            })
+            levelSound.stop()
+           
+            go('game', {
+                level: (level + 1) % maps.length,
+                score: scoreLabel.value,
+                
+                
+                
+            })
+        }})
+        keyDown('s', ()=>{
+            if(player.collides('castle')){
+                play('stageClear', {
+                    volume: 1.0,
+                    speed: 0.8,
+                    detune: 1200
+                })
+                levelSound.stop()
+
+                go('game', {
+
+                    level: (level + 1) % maps.length,
+                    score: scoreLabel.value,
+                    // isBig = false,
+                    // currentJumpForce = jumpForce
+                    
+                    
+                })
+                
+            }else if(player.collides('win')){
+               
+                levelSound.stop()
+
+                go('win', {score: scoreLabel.value})
+                // play(soundArray[5], {
+                //     volume: 1.0,
+                //     speed: 0.8,
+                //     detune: 1200
+                // })
+                
+            
+            }else{
+                play('downPipe', {
+
+                    volume: 1.0,
+                    speed: 0.8,
+                    detune: 1200
                    
             })
 
                 levelSound.stop()
                 
                 go('game', {
+
                     level: (level + 1) % maps.length,
                     score: scoreLabel.value,
-                    isBig: false
-                    
-                    
+
                 })
             }
         })
@@ -802,11 +832,19 @@ scene('lose', ({score})=>{
 
     keyDown('space', ()=>{
         credit.stop()
-        go('game', {level: 0, score:0, isBig: false})
+        go('game', {
+            level: 0, 
+            score:0, 
+            
+        })
     })
     mouseRelease(()=>{
         credit.stop()
-        go('game', {level: 0, score:0, isBig: false})
+        go('game', {
+            level: 0, 
+            score:0, 
+            
+        })
     })
 })
  
@@ -848,13 +886,22 @@ scene('win', ({score})=>{
 
     keyDown('space', ()=>{
         credit.stop()
-        go('game', {level: 0, score:0, isBig: false})
+        go('game', {
+            level: 0, 
+            score:0, 
+        })
     })
     mouseRelease(()=>{
         credit.stop()
-        go('game', {level: 0, score:0, isBig: false})
+        go('game', {
+            level: 0, 
+            score:0, 
+        })
     })
 })
 
 
-start('game', {level: 0, score:0, isBig: false})
+start('game', {
+    level: 0, 
+    score:0, 
+})
