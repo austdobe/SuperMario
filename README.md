@@ -21,9 +21,7 @@
 
 #### 3. Enjoy and leave me feedback. You can find me on Linkedin or check out my facebook page. 
 
-#### Linkedin: https://www.linkedin/in/austin-dober 
-
-#### Facebook: https://www.facebook.com/adoberweb/ 
+#### Linkedin: https://www.linkedin/in/austin-dober       #### Facebook: https://www.facebook.com/adoberweb/ 
 
 
 ## Demo: 
