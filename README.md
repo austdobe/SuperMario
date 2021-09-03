@@ -28,7 +28,7 @@
 
 ## Demo: 
 
-![DemoPlay](/images/MarioDemo.mp4)
+![DemoPlay](https://user-images.githubusercontent.com/48484800/132048773-1daa652a-e7d0-4a93-a728-df6536cc1bff.mp4)
 
 
 ## Technologies used
